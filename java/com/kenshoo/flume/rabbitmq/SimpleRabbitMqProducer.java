@@ -32,8 +32,10 @@ public class SimpleRabbitMqProducer implements QueuePublisher {
     private ConnectionFactory factory;
     private Connection conn;
     private Channel channel;
+	private String exchange;
 
-    public SimpleRabbitMqProducer(String host, String userName, String password) {
+    public SimpleRabbitMqProducer(String host, String userName, String password, String exchange) {
+        this.exchange = exchange;
         factory = new ConnectionFactory();
         factory.setUsername(userName);
         factory.setPassword(password);
@@ -54,6 +56,6 @@ public class SimpleRabbitMqProducer implements QueuePublisher {
 
     public void publish(String queueName, byte[] msg) throws IOException {
         channel.queueDeclare(queueName, false, false, false, null);
-        channel.basicPublish("", queueName, MessageProperties.TEXT_PLAIN, msg);
+        channel.basicPublish(exchange, queueName, MessageProperties.TEXT_PLAIN, msg);
     }
 }
