@@ -5,4 +5,4 @@
 *.iws
 /build/*
 /out/*
-
+bin
