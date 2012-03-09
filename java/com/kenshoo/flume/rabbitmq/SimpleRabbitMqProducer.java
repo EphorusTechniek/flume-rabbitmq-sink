@@ -51,6 +51,8 @@ public class SimpleRabbitMqProducer implements QueuePublisher {
     public void open() throws IOException {
         conn = factory.newConnection();
         channel = conn.createChannel();
+        channel.queueDeclare(queueName, false, false, false, null);
+        channel.queueBind(queueName, exchange, routingKey, null);
     }
 
     public void close() throws IOException {
@@ -59,12 +61,11 @@ public class SimpleRabbitMqProducer implements QueuePublisher {
     }
 
     public void publish(String queueName, byte[] msg) throws IOException {
-    	if (this.queueName != null) {
-    		queueName = this.queueName;
+    	String routingKey = this.routingKey;
+    	if (this.routingKey != null) {
+    		routingKey = queueName;
     	}
-        channel.queueDeclare(queueName, false, false, false, null);
-        channel.queueBind(queueName, exchange, routingKey, null);
-        channel.basicPublish(exchange, queueName, MessageProperties.TEXT_PLAIN, msg);
+        channel.basicPublish(exchange, routingKey, MessageProperties.TEXT_PLAIN, msg);
     }
 
 	public ConnectionFactory getFactory() {
