@@ -29,8 +29,8 @@ import java.util.List;
  * Pre condition - the incoming event has a "host" header containing the rabbitmq queue name.
  */
 public class RabbitMqSink extends EventSink.Base {
-    private QueuePublisher rabbitMqProducer;
-    private String queueDomain;
+    private final QueuePublisher rabbitMqProducer;
+    private final String queueDomain;
 
     public RabbitMqSink(QueuePublisher rabbitMqProducer) {
         this(rabbitMqProducer,"");
@@ -87,4 +87,11 @@ public class RabbitMqSink extends EventSink.Base {
     return builders;
   }
 
+  public QueuePublisher getRabbitMqProducer() {
+    return rabbitMqProducer;
+  }
+
+  public String getQueueDomain() {
+    return queueDomain;
+  }
 }

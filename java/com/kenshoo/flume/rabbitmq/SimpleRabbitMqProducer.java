@@ -29,13 +29,17 @@ import java.io.IOException;
  * Time: 7:12 PM
  */
 public class SimpleRabbitMqProducer implements QueuePublisher {
-    private ConnectionFactory factory;
+    private final ConnectionFactory factory;
     private Connection conn;
     private Channel channel;
-	private String exchange;
+	private final String exchange;
+	private final String queueName;
+	private final String routingKey;
 
-    public SimpleRabbitMqProducer(String host, String userName, String password, String exchange) {
+    public SimpleRabbitMqProducer(String host, String userName, String password, String exchange, String queueName, String routingKey) {
         this.exchange = exchange;
+		this.queueName = queueName;
+		this.routingKey = routingKey;
         factory = new ConnectionFactory();
         factory.setUsername(userName);
         factory.setPassword(password);
@@ -55,7 +59,27 @@ public class SimpleRabbitMqProducer implements QueuePublisher {
     }
 
     public void publish(String queueName, byte[] msg) throws IOException {
+    	if (this.queueName != null) {
+    		queueName = this.queueName;
+    	}
         channel.queueDeclare(queueName, false, false, false, null);
+        channel.queueBind(queueName, exchange, routingKey, null);
         channel.basicPublish(exchange, queueName, MessageProperties.TEXT_PLAIN, msg);
     }
+
+	public ConnectionFactory getFactory() {
+		return factory;
+	}
+
+	public String getExchange() {
+		return exchange;
+	}
+
+	public String getQueueName() {
+		return queueName;
+	}
+
+	public String getRoutingKey() {
+		return routingKey;
+	}
 }

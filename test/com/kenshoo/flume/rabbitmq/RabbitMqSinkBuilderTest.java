@@ -39,7 +39,7 @@ public class RabbitMqSinkBuilderTest {
 		RabbitMqSinkBuilder rabbitMqSinkBuilder = new RabbitMqSinkBuilder();
 		Context context = mockery.mock(Context.class);
 		String publisher = "publisher-" + Math.random();
-		RabbitMqSink eventSink = (RabbitMqSink) rabbitMqSinkBuilder.build(context, publisher);
+		RabbitMqSink eventSink = (RabbitMqSink) rabbitMqSinkBuilder.build(context, "-h", publisher);
 		assertEquals(RabbitMqSink.class.getSimpleName(), eventSink.getName());
 	}
 
@@ -57,8 +57,50 @@ public class RabbitMqSinkBuilderTest {
 		String userName = "userName-" + Math.random();
 		String password = "password-" + Math.random();
 		String exchange = "exchange-" + Math.random();
-		RabbitMqSink eventSink = (RabbitMqSink) rabbitMqSinkBuilder.build(context, publisher,
-				queueDomain, userName, password, exchange);
+		String queueName = "queueName-" + Math.random();
+		String routingKey = "routingKey-" + Math.random();
+
+		RabbitMqSink eventSink = (RabbitMqSink) rabbitMqSinkBuilder.build(context, "-h", publisher,
+				"-d", queueDomain, "-u", userName, "-p", password, "-e", exchange, "-q", queueName,
+				"-r", routingKey);
+
 		assertEquals(RabbitMqSink.class.getSimpleName(), eventSink.getName());
+		assertEquals(queueDomain, eventSink.getQueueDomain());
+
+		SimpleRabbitMqProducer producer = (SimpleRabbitMqProducer) eventSink.getRabbitMqProducer();
+		assertEquals(userName, producer.getFactory().getUsername());
+		assertEquals(password, producer.getFactory().getPassword());
+		assertEquals(exchange, producer.getExchange());
+		assertEquals(queueName, producer.getQueueName());
+		assertEquals(routingKey, producer.getRoutingKey());
+	}
+
+	@Test
+	public void testBuildWithSomeParametersUseDefaults() {
+		mockery = new Mockery() {
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+		RabbitMqSinkBuilder rabbitMqSinkBuilder = new RabbitMqSinkBuilder();
+		Context context = mockery.mock(Context.class);
+		String publisher = "publisher-" + Math.random();
+		String queueDomain = "queueDomain-" + Math.random();
+		String password = "password-" + Math.random();
+		String queueName = "queueName-" + Math.random();
+		String routingKey = "routingKey-" + Math.random();
+
+		RabbitMqSink eventSink = (RabbitMqSink) rabbitMqSinkBuilder.build(context, "-h", publisher,
+				"-d", queueDomain, "-p", password, "-q", queueName, "-r", routingKey);
+
+		assertEquals(RabbitMqSink.class.getSimpleName(), eventSink.getName());
+		assertEquals(queueDomain, eventSink.getQueueDomain());
+
+		SimpleRabbitMqProducer producer = (SimpleRabbitMqProducer) eventSink.getRabbitMqProducer();
+		assertEquals("guest", producer.getFactory().getUsername());
+		assertEquals(password, producer.getFactory().getPassword());
+		assertEquals("", producer.getExchange());
+		assertEquals(queueName, producer.getQueueName());
+		assertEquals(routingKey, producer.getRoutingKey());
 	}
 }
