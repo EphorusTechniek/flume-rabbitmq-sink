@@ -16,6 +16,8 @@
 package com.kenshoo.flume.rabbitmq;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.jmock.Mockery;
 import org.jmock.integration.junit4.JMock;
@@ -95,6 +97,37 @@ public class RabbitMqSinkBuilderTest {
 
 		assertEquals(RabbitMqSink.class.getSimpleName(), eventSink.getName());
 		assertEquals(queueDomain, eventSink.getQueueDomain());
+		assertFalse(eventSink.doFormatAttributes());
+
+		SimpleRabbitMqProducer producer = (SimpleRabbitMqProducer) eventSink.getRabbitMqProducer();
+		assertEquals("guest", producer.getFactory().getUsername());
+		assertEquals(password, producer.getFactory().getPassword());
+		assertEquals("", producer.getExchange());
+		assertEquals(queueName, producer.getQueueName());
+		assertEquals(routingKey, producer.getRoutingKey());
+	}
+
+	@Test
+	public void testBuildWithFormatAttributes() {
+		mockery = new Mockery() {
+			{
+				setImposteriser(ClassImposteriser.INSTANCE);
+			}
+		};
+		RabbitMqSinkBuilder rabbitMqSinkBuilder = new RabbitMqSinkBuilder();
+		Context context = mockery.mock(Context.class);
+		String publisher = "publisher-" + Math.random();
+		String queueDomain = "queueDomain-" + Math.random();
+		String password = "password-" + Math.random();
+		String queueName = "queueName-" + Math.random();
+		String routingKey = "routingKey-" + Math.random();
+
+		RabbitMqSink eventSink = (RabbitMqSink) rabbitMqSinkBuilder.build(context, "-h", publisher,
+				"-d", queueDomain, "-p", password, "-q", queueName, "-r", routingKey, "-f");
+
+		assertEquals(RabbitMqSink.class.getSimpleName(), eventSink.getName());
+		assertEquals(queueDomain, eventSink.getQueueDomain());
+		assertTrue(eventSink.doFormatAttributes());
 
 		SimpleRabbitMqProducer producer = (SimpleRabbitMqProducer) eventSink.getRabbitMqProducer();
 		assertEquals("guest", producer.getFactory().getUsername());

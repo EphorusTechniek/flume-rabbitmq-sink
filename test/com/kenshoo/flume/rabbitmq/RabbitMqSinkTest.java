@@ -69,7 +69,7 @@ public class RabbitMqSinkTest {
 
     @Test
     public void appendsPrefixToQueueNameIfGiven() throws IOException {
-        sink = new RabbitMqSink(publisher,"queue.prefix");
+        sink = new RabbitMqSink(publisher,"queue.prefix",false);
         context.checking(new Expectations(){{
             oneOf(publisher).publish("queue.prefix." + QUEUE_NAME,MSG_BODY.getBytes());
         }});

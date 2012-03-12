@@ -31,14 +31,16 @@ import java.util.List;
 public class RabbitMqSink extends EventSink.Base {
     private final QueuePublisher rabbitMqProducer;
     private final String queueDomain;
+	private final boolean formatAttributes;
 
     public RabbitMqSink(QueuePublisher rabbitMqProducer) {
-        this(rabbitMqProducer,"");
+        this(rabbitMqProducer, "", false);
     }
 
-    public RabbitMqSink(QueuePublisher publisher, String queueDomain) {
+    public RabbitMqSink(QueuePublisher publisher, String queueDomain, boolean formatAttributes) {
         this.rabbitMqProducer = publisher;
         this.queueDomain = queueDomain;
+        this.formatAttributes = formatAttributes;
     }
 
     @Override
@@ -51,7 +53,11 @@ public class RabbitMqSink extends EventSink.Base {
         String queueName = extractTragetQueueName(e);
         if (domainWasSpecified())
             queueName = appendDomainName(queueName);
-        rabbitMqProducer.publish(queueName,e.getBody());
+        if (doFormatAttributes()) {
+            rabbitMqProducer.publish(queueName, e);
+        } else {
+            rabbitMqProducer.publish(queueName,e.getBody());
+        }
     }
 
     private String appendDomainName(String queueName) {
@@ -93,5 +99,9 @@ public class RabbitMqSink extends EventSink.Base {
 
   public String getQueueDomain() {
     return queueDomain;
+  }
+
+  public boolean doFormatAttributes() {
+    return formatAttributes;
   }
 }

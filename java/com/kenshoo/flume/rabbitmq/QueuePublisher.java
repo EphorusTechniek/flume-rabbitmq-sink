@@ -17,6 +17,8 @@ package com.kenshoo.flume.rabbitmq;
 
 import java.io.IOException;
 
+import com.cloudera.flume.core.Event;
+
 /**
  * Created by IntelliJ IDEA.
  * User: sagyr
@@ -29,4 +31,6 @@ public interface QueuePublisher {
     void close() throws IOException;
 
     void publish(String queueName, byte[] msg) throws IOException;
+
+    void publish(String queueName, Event e) throws IOException;
 }

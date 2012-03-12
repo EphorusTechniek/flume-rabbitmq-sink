@@ -38,6 +38,7 @@ class RabbitMqSinkBuilder extends SinkFactory.SinkBuilder {
 	private static final String PN_PASSWORD = "password";
 	private static final String PN_USER_NAME = "userName";
 	private static final String PN_QUEUE_DOMAIN = "queueDomain";
+	private static final String PN_FORMAT_ATTR = "";
 
 	@SuppressWarnings("static-access")
 	private Options createOptions() {
@@ -78,6 +79,9 @@ class RabbitMqSinkBuilder extends SinkFactory.SinkBuilder {
 				.hasArg() //
 				.withArgName("key") //
 				.create('r'));
+		options.addOption(OptionBuilder.withLongOpt(PN_FORMAT_ATTR) //
+				.withDescription("Format the attributes of the event like: X-Flume-attr: value|") //
+				.create('f'));
 		return options;
 	}
 
@@ -108,8 +112,9 @@ class RabbitMqSinkBuilder extends SinkFactory.SinkBuilder {
 					: null;
 			String routingKey = cmd.hasOption(PN_ROUTING_KEY) ? cmd.getOptionValue(PN_ROUTING_KEY)
 					: null;
+			boolean formatAttributes = cmd.hasOption(PN_FORMAT_ATTR);
 			return new RabbitMqSink(new SimpleRabbitMqProducer(publisher, userName, password,
-					exchange, queueName, routingKey), queueDomain);
+					exchange, queueName, routingKey), queueDomain, formatAttributes);
 		} catch (ParseException e) {
 			StringHelpFormatter formatter = new StringHelpFormatter();
 			throw new IllegalArgumentException(e.getMessage() + ", synopsys is: "
