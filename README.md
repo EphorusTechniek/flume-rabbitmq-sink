@@ -23,15 +23,19 @@ section on the master node.
 
 ## Options
 Options that can be passed to this sink:
--d,--queueDomain <domain> The domain to add to the host
--e,--exchange <name>      The name of the exchange in the RabbitMQ
--f,--                     Format the attributes of the event like: X-Flume-attr: value|
--h,--host <host>          The RabbitMQ host to connect to
--p,--password <password>  The password to connect to RabbitMQ
--q,--queueName <name>     The name of the queue in the RabbitMQ
--r,--routingKey <key>     The routing key of the message
--u,--userName <name>      The username to connect to RabbitMQ
+
+    -h,--host <host>          The RabbitMQ host to connect to
+    -d,--queueDomain <domain> The domain to add to the host
+    -u,--userName <name>      The username to connect to RabbitMQ
+    -p,--password <password>  The password to connect to RabbitMQ
+    -q,--queueName <name>     The name of the queue in the RabbitMQ
+    -r,--routingKey <key>     The routing key of the message
+    -e,--exchange <name>      The name of the exchange in the RabbitMQ
+    -f                        Format the attributes of the event like: X-Flume-attr: value|
+
+All options are optional except the RabbitMQ host.
 
 ## License
 This code is released under the Apache Public License 2.0.
+
 
